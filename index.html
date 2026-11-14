@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>通讯录 · Address Book</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='white' font-family='sans-serif'%3E%E9%80%9A%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M4 17.5h16"/><path d="M8 7h8M8 11h5"/></svg>
+      </span>
+      <span class="brand-text">
+        <strong>通讯录</strong>
+        <small>Address Book</small>
+      </span>
+    </div>
+
+    <nav class="nav" aria-label="视图">
+      <button type="button" class="nav-item is-active" data-view="all">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11"/></svg>
+        </span>
+        <span class="nav-label">全部联系人</span>
+        <span class="pill" id="count-all">0</span>
+      </button>
+      <button type="button" class="nav-item" data-view="bookmarked">
+        <span class="nav-icon star-icon">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.7 5.9 6.3.7-4.6 4.5 1.2 6.4L12 17.6 6.4 20.5l1.2-6.4L3 9.6l6.3-.7z"/></svg>
+        </span>
+        <span class="nav-label">收藏</span>
+        <span class="pill" id="count-bookmarked">0</span>
+      </button>
+    </nav>
+
+    <section class="side-block">
+      <h2 class="side-title">分组</h2>
+      <ul class="chips-list" id="group-list"></ul>
+    </section>
+
+    <section class="side-block">
+      <h2 class="side-title">标签</h2>
+      <div class="tag-cloud" id="tag-cloud"></div>
+    </section>
+
+    <div class="side-footer">
+      <p>数据保存在本机浏览器（localStorage）</p>
+      <button type="button" class="link-btn" id="btn-seed">恢复示例数据</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="search">
+        <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search" type="search" placeholder="搜索姓名、公司、号码、邮箱、标签…（Ctrl + K）" autocomplete="off" aria-label="搜索联系人">
+        <kbd>Ctrl K</kbd>
+      </div>
+      <div class="top-actions">
+        <button type="button" class="btn btn-ghost" id="btn-import">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
+          导入 Excel
+        </button>
+        <button type="button" class="btn btn-ghost" id="btn-export">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
+          导出 Excel
+        </button>
+        <button type="button" class="btn btn-primary" id="btn-new">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          新建联系人
+        </button>
+      </div>
+    </header>
+
+    <section class="page-head">
+      <div>
+        <h1 id="view-title">全部联系人</h1>
+        <p class="page-sub" id="view-sub">按姓名浏览你的通讯录</p>
+      </div>
+      <div class="page-tools">
+        <label class="select-wrap">
+          <span>排序</span>
+          <select id="sort">
+            <option value="name">姓名 A → Z</option>
+            <option value="updated">最近修改</option>
+            <option value="methods">联系方式最多</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <div class="filter-bar" id="filter-bar" hidden>
+      <span id="filter-text"></span>
+      <button type="button" class="link-btn" id="filter-clear">清除筛选</button>
+    </div>
+
+    <div class="contact-grid" id="list" role="list"></div>
+
+    <div class="empty" id="empty" hidden>
+      <svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+      <h3 id="empty-title">还没有联系人</h3>
+      <p id="empty-text">点击右上角「新建联系人」，或从 Excel 导入已有通讯录。</p>
+    </div>
+  </main>
+</div>
+
+<!-- ============ 编辑 / 新建联系人 ============ -->
+<dialog id="editor" class="modal">
+  <form id="editor-form" novalidate>
+    <header class="modal-head">
+      <h2 id="editor-title">新建联系人</h2>
+      <button type="button" class="icon-btn" data-close aria-label="关闭">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+
+    <div class="modal-body">
+      <div class="form-grid">
+        <label class="field">
+          <span class="field-label">姓名 <em>*</em></span>
+          <input name="name" type="text" maxlength="40" placeholder="例如：张鑫宇" autocomplete="off">
+          <small class="field-error" data-error-for="name"></small>
+        </label>
+        <label class="field">
+          <span class="field-label">公司 / 部门</span>
+          <input name="company" type="text" maxlength="60" placeholder="例如：福州大学 计算机学院" autocomplete="off">
+        </label>
+        <label class="field">
+          <span class="field-label">分组</span>
+          <input name="group" type="text" maxlength="30" list="group-options" placeholder="例如：同学" autocomplete="off">
+          <datalist id="group-options"></datalist>
+        </label>
+        <label class="field">
+          <span class="field-label">标签</span>
+          <input name="tags" type="text" maxlength="120" placeholder="用逗号分隔，例如：同事, 项目组" autocomplete="off">
+        </label>
+      </div>
+
+      <label class="switch-row">
+        <input type="checkbox" name="bookmarked">
+        <span class="switch-box" aria-hidden="true"></span>
+        <span>
+          <strong>收藏该联系人</strong>
+          <small>收藏后会在「收藏」视图置顶显示，方便快速找到常联系的人。</small>
+        </span>
+      </label>
+
+      <section class="methods-block">
+        <div class="section-head">
+          <h3>联系方式 <span class="hint">一个联系人可以有多个手机号 / 邮箱 / 微信 / 地址…</span></h3>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-add-method">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            添加联系方式
+          </button>
+        </div>
+        <div class="method-rows" id="method-rows"></div>
+        <small class="field-error" data-error-for="methods"></small>
+      </section>
+
+      <label class="field">
+        <span class="field-label">备注</span>
+        <textarea name="note" rows="2" maxlength="300" placeholder="例如：小组组长，周二下午没课"></textarea>
+      </label>
+    </div>
+
+    <footer class="modal-foot">
+      <button type="button" class="btn btn-ghost" data-close>取消</button>
+      <button type="submit" class="btn btn-primary" id="editor-submit">保存</button>
+    </footer>
+  </form>
+</dialog>
+
+<!-- ============ 导入 Excel ============ -->
+<dialog id="import-dialog" class="modal">
+  <header class="modal-head">
+    <h2>导入 Excel</h2>
+    <button type="button" class="icon-btn" data-close aria-label="关闭">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </header>
+
+  <div class="modal-body">
+    <div class="dropzone" id="dropzone">
+      <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/><path d="m9 13 2 2-2 2M14 17h1"/></svg>
+      <p><strong>把 .xlsx / .xls / .csv 文件拖到这里</strong></p>
+      <p class="muted">或者
+        <button type="button" class="link-btn" id="btn-pick-file">选择文件</button>
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv" hidden>
+      </p>
+      <p class="muted small">支持本应用导出的宽表格式，也兼容「姓名 / 手机 / 邮箱 / 地址」这类普通表格。</p>
+    </div>
+
+    <div class="import-preview" id="import-preview" hidden>
+      <div class="import-summary" id="import-summary"></div>
+      <div class="preview-table-wrap">
+        <table class="preview-table" id="preview-table"></table>
+      </div>
+      <div class="import-issues" id="import-issues" hidden></div>
+      <fieldset class="strategy">
+        <legend>遇到已存在的联系人时</legend>
+        <label><input type="radio" name="strategy" value="merge" checked> <span><strong>合并</strong>：补充新的联系方式与标签</span></label>
+        <label><input type="radio" name="strategy" value="skip"> <span><strong>跳过</strong>：保留原有记录不变</span></label>
+        <label><input type="radio" name="strategy" value="overwrite"> <span><strong>覆盖</strong>：用表格里的内容替换原有记录</span></label>
+      </fieldset>
+    </div>
+  </div>
+
+  <footer class="modal-foot">
+    <button type="button" class="btn btn-ghost" id="btn-template">下载导入模板</button>
+    <span class="spacer"></span>
+    <button type="button" class="btn btn-ghost" data-close>取消</button>
+    <button type="button" class="btn btn-primary" id="btn-do-import" disabled>确认导入</button>
+  </footer>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="vendor/xlsx.full.min.js"></script>
+<script src="assets/js/model.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/excel.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
