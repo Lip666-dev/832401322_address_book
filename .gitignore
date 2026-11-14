@@ -1,0 +1,16 @@
+# 本地运行产生的临时文件
+_verification/
+__pycache__/
+*.pyc
+node_modules/
+.DS_Store
+Thumbs.db
+
+# 截图 / 视频等证据不进代码仓库，统一放在作业博客的附件里
+blog/images/
+blog/*.mp4
+blog/*.gif
+
+# 下载的 Excel 与测试中间产物
+downloads/
+*.crdownload
