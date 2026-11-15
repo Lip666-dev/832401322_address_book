@@ -1,0 +1,21 @@
+[Unit]
+Description=Address Book static site (EE308FZ extreme programming assignment)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/address-book
+Environment=PORT=8081
+ExecStart=/usr/bin/python3 /var/www/address-book/serve.py
+Restart=on-failure
+RestartSec=3
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target
+
+# 用法：
+#   cp deploy/address-book.service /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now address-book
+#   systemctl status address-book
