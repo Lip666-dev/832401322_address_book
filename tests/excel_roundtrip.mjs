@@ -256,6 +256,19 @@ check('导入模板：模板里的示例行能被正确解析', () => {
   equal(parsed.contacts[1].methods.map((m) => m.type), ['phone', 'address']);
 });
 
+/* 9. CSV 编码 */
+check('CSV 编码：UTF-8 与中文 Excel 常见的 GBK 都能正确解码', () => {
+  const utf8 = new TextEncoder().encode('姓名,手机\n张鑫宇,138 0013 8000\n');
+  equal(Excel.decodeCsv(utf8).split('\n')[1], '张鑫宇,138 0013 8000');
+
+  // 「姓名」的 GBK 字节：D0 D5 C3 FB —— 按 UTF-8 解是非法字节，应自动退回 GBK
+  const gbk = new Uint8Array([0xD0, 0xD5, 0xC3, 0xFB]);
+  equal(Excel.decodeCsv(gbk), '姓名');
+
+  const withBom = new Uint8Array([0xEF, 0xBB, 0xBF, ...utf8]);
+  equal(Excel.decodeCsv(withBom).split('\n')[0], '姓名,手机');
+});
+
 console.log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) {
   process.exitCode = 1;

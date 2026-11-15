@@ -498,14 +498,12 @@
     var reader = new FileReader();
     reader.onerror = function () { toast('读取文件失败，请重试', 'err'); };
     reader.onload = function () {
-      var payload = /\.csv$/i.test(file.name) ? String(reader.result) : new Uint8Array(reader.result);
+      var bytes = new Uint8Array(reader.result);
+      // CSV 里中文常见 GBK 编码，交给 excel.js 判断编码后再解析
+      var payload = /\.csv$/i.test(file.name) ? Excel.decodeCsv(bytes) : bytes;
       handleParsed(payload, file.name);
     };
-    if (/\.csv$/i.test(file.name)) {
-      reader.readAsText(file, 'UTF-8');
-    } else {
-      reader.readAsArrayBuffer(file);
-    }
+    reader.readAsArrayBuffer(file);
   }
 
   function handleParsed(payload, fileName) {

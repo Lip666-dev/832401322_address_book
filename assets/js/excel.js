@@ -191,6 +191,24 @@
 
   /* ------------------------------ 导入 ------------------------------ */
 
+  /**
+   * 解码 CSV 文本：中文 Windows 上 Excel 导出的 CSV 常见是 GBK 编码，
+   * 直接按 UTF-8 读会把中文读成乱码。先严格按 UTF-8 解，失败再退回 GBK。
+   */
+  function decodeCsv(bytes) {
+    var data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes || 0);
+    if (typeof TextDecoder === 'undefined') { return ''; }
+    try {
+      return new TextDecoder('utf-8', { fatal: true }).decode(data);
+    } catch (error) {
+      try {
+        return new TextDecoder('gbk').decode(data);
+      } catch (fallbackError) {
+        return new TextDecoder('utf-8').decode(data);
+      }
+    }
+  }
+
   function isTruthy(value) {
     var text = Model.normalizeKey(value);
     return ['是', 'y', 'yes', 'true', '1', '✓', '√', '已收藏', '收藏'].indexOf(text) >= 0;
@@ -486,6 +504,7 @@
     BASE_FIELDS: BASE_FIELDS,
     buildTable: buildTable,
     classifyHeader: classifyHeader,
+    decodeCsv: decodeCsv,
     exportWorkbook: exportWorkbook,
     buildTemplate: buildTemplate,
     exportFileName: exportFileName,
