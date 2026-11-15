@@ -1,4 +1,4 @@
-# 通讯录 · Address Book
+﻿# 通讯录 · Address Book
 
 EE308FZ 软件工程 / 2601_FZU-MU_SE 极限编程作业 —— 一对程序员合作完成的通讯录应用。
 
@@ -92,7 +92,7 @@ node tests/excel_roundtrip.mjs     # 10 个用例：宽表结构、导出→读�
 
 | 方式 | 做法 |
 | --- | --- |
-| 云服务器（本次作业采用） | `scp -r address-book/* root@<server>:/var/www/address-book/`，用 Nginx 或 `PORT=8080 python serve.py` 起服务，见 `deploy/` |
+| 云服务器（可选，本次未部署） | `bash deploy/deploy.sh root@<server>` 一键上传，用 Nginx 或 `PORT=8081 python serve.py` 起服务，见 `deploy/README.md` |
 | GitHub Pages | 仓库 Settings → Pages → Source 选 `main` / 根目录 |
 | 本地演示 | `python serve.py` |
 
@@ -108,3 +108,9 @@ node tests/excel_roundtrip.mjs     # 10 个用例：宽表结构、导出→读�
 - 实现设计：[docs/design.md](docs/design.md)
 - 测试报告：[docs/test-report.md](docs/test-report.md)
 - 作业博客：`blog/`（含截图、演示视频、PSP 表、分工与贡献比）
+
+## 9. 版本与发布
+
+- **v1.0.0**（2026-11-15）：收藏、多联系方式、Excel 导入导出三项功能完成，21 个自动化用例全部通过，界面在 Edge 157 上实测。
+- 演示视频：[docs/media/address-book-demo.mp4](docs/media/address-book-demo.mp4)（约 27 秒）。
+- 仓库：<https://github.com/Lip666-dev/832401322_address_book>
