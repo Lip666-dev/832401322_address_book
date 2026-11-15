@@ -1,4 +1,4 @@
-# 通讯录静态站点（Windows 上一键上传）
+﻿# 通讯录静态站点（Windows 上一键上传）
 #
 #   pwsh -File deploy\deploy.ps1 -Target root@192.144.235.99
 #   pwsh -File deploy\deploy.ps1 -Target root@192.144.235.99 -Port 8081 -RemoteDir /var/www/address-book
@@ -26,7 +26,7 @@ try {
 }
 Write-Host ("    包大小 {0:N1} KB" -f ((Get-Item $temp).Length / 1KB))
 
-Write-Host "==> 上传到 $Target:$RemoteDir" -ForegroundColor Cyan
+Write-Host "==> 上传到 ${Target}:$RemoteDir" -ForegroundColor Cyan
 ssh $Target "mkdir -p '$RemoteDir'"
 scp $temp "${Target}:$RemoteDir/app.tar.gz"
 ssh $Target "cd '$RemoteDir' && tar -xzf app.tar.gz && rm app.tar.gz && chmod -R a+rX ."
